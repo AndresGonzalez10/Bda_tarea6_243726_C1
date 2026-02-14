@@ -17,3 +17,16 @@ services:
       interval: 5s
       timeout: 5s
       retries: 5
+
+  web:
+    build: 
+      context: . 
+      dockerfile: Dockerfile
+    container_name: torneo_web
+    environment:
+      DATABASE_URL: ${DATABASE_URL}
+    ports:
+      - "3000:3000"
+    depends_on:
+      db:
+        condition: service_healthy #

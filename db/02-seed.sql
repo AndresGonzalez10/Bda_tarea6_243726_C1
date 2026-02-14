@@ -27,7 +27,7 @@ INSERT INTO players (team_id, nickname) VALUES
 (6, 'Hunk'), (6, 'Nicholai'), (6, 'Mikhail'), (6, 'Carlos'), (6, 'Tyrell'),
 -- Equipo 7 
 (7, 'Marcus'), (7, 'Riden'), (7, 'Snake'), (7, 'Kirby'), (7, 'Mario'),
--- Equipo 8 (BSAA)
+-- Equipo 8 
 (8, 'Sheva'), (8, 'Piers'), (8, 'Helena'), (8, 'Sherry'), (8, 'Leon');
 
 -- Partidas

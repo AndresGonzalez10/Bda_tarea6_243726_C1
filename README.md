@@ -1,11 +1,15 @@
-## 🔒 Configuración y Seguridad (Threat Model)
+Tarea 6: Dashboard de ReportesAplicación de Inteligencia de Negocios (BI) con Next.js + PostgreSQL, que consume reportes SQL optimizados mediante una arquitectura segura de Vistas, Roles y Docker.Inicio RápidoEl proyecto utiliza Docker Compose para orquestar la base de datos y la aplicación web con un solo comando.1. Configurar variables de entorno Code # Crea el archivo .env basado en el ejemplo proporcionado
 
-Para evitar la exposición de credenciales (SQL Injection y fugas de contraseñas), este proyecto sigue un modelo de seguridad estricto:
-1. **Sin credenciales hardcodeadas:** Ningún archivo del repositorio contiene contraseñas reales.
-2. **Uso de `.env`:** Las credenciales se inyectan mediante el archivo `.env` (provisto de forma privada).
-3. **Principio de Mínimo Privilegio:** La aplicación Next.js no usa el usuario `postgres`. Se conecta mediante un rol dedicado (`{APP_DB_USER}`) que tiene explícitamente denegado el acceso a las tablas base y solo puede hacer `SELECT` sobre las Vistas.
-
-### 🚀 Instrucciones de Ejecución
-1. Coloca el archivo `.env` (enviado por privado) en la raíz del proyecto.
-2. Abre el archivo `db/roles.sql` y reemplaza `{APP_DB_USER}` y `{APP_DB_PASSWORD}` por las credenciales de la App estipuladas en el `.env`.
-3. Ejecuta el comando: `docker compose up --build`
+cp .env.example .envAsegúrate de configurar `DATABASE_URL` antes de continuar.2. Levantar el entorno Code docker compose up --build3. Acceder a la aplicaciónServicioURL / PuertoWeb Dashboardhttp://localhost:3000Base de datosPuerto 5432 (interno)4. Apagar Code docker compose downArquitectura y Vistas SQLSe implementaron 5 vistas para encapsular consultas complejas y entregar datos limpios al frontend.VistaReporteDescripciónvw_player_global_rankingReporte 1Abstrae JOINs complejos y agrega totales de puntos y partidas jugadas por jugador.vw_top_teamsReporte 2Implementa lógica condicional y filtros de grupo para segmentar equipos por puntaje acumulado.vw_games_popularity_rankingReporte 3Clasifica los videojuegos por total de puntos generados y nivel de actividad.vw_lowest_performer_per_teamReporte 4Identifica el jugador de menor desempeño en cada equipo.vw_lowest_performer_per_gameReporte 5Muestra el jugador con menor puntaje acumulado en cada videojuego.Decisiones Técnicas (Trade-offs)Lógica en SQL vs Next.jsDecisión: Se delegó el 100% de la lógica de agregación y filtrado a PostgreSQL mediante Vistas.Por qué: PostgreSQL es significativamente más eficiente procesando grandes volúmenes de datos en comparación con JavaScript, evitando así un aumento en la latencia y el consumo de memoria.Server-Side Rendering (Dynamic)Decisión: Uso de export const dynamic = 'force-dynamic' en todas las rutas.Por qué: Los reportes requieren datos en tiempo real, haciendo que la generación estática no sea viable para un dashboard operativo.Pool de ConexionesDecisión: Uso de pg.Pool en lugar de conexiones individuales.Por qué: Mantiene conexiones vivas y listas para reutilizarse, reduciendo el overhead del handshake TCP en cada petición HTTP.Evidencia de Performance (EXPLAIN ANALYZE)Evidencia 1 — Filtrado Optimizado por Texto Code GroupAggregate  (cost=0.43..16.63 rows=1 width=290) (actual time=0.012..0.013 rows=0 loops=1)
+  Group Key: c.nombre
+...Análisis: Al filtrar por categoría, la base de datos utiliza un Index Scan en lugar de leer toda la tabla, reduciendo drásticamente el tiempo de búsqueda.Evidencia 2 — Agregación Eficiente con JOINs Code HashAggregate  (cost=19.31..19.50 rows=4 width=290) (actual time=0.091..0.094 rows=3 loops=1)
+  Group Key: c.nombre
+...Análisis: PostgreSQL utiliza un Hash Join para combinar datos eficientemente en memoria, optimizando la agregación.Modelo de Seguridad (Threat Model)Prevención de SQL InjectionSe utilizan exclusivamente consultas parametrizadas en el cliente de Node.js.Los inputs del usuario son validados antes de llegar a la base de datos.Gestión de SecretosNo hay credenciales hardcodeadas en el código fuente.La conexión se realiza mediante variables de entorno inyectadas por Docker.Principio de Mínimo PrivilegioLa aplicación web se conecta usando un rol con permisos limitados, garantizando la integridad de los datos.Anexo: Estructura de Base de DatosEvidencia de las vistas SQL creadas en el proyecto: Code actividad_db=# \dv
+              List of relations
+ Schema |         Name          | Type |  Owner
+--------+-----------------------+------+----------
+ public | vw_player_global_ranking | view | postgres
+ public | vw_top_teams          | view | postgres
+ public | vw_games_popularity_ranking | view | postgres
+ public | vw_lowest_performer_per_team | view | postgres
+ public | vw_lowest_performer_per_game | view | postgres

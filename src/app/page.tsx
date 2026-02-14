@@ -14,28 +14,28 @@ export default function DashboardHome() {
       title: 'Equipos Ganadores',
       description: 'Los equipos ordenados por su puntaje acumulado y su promedio de puntos.',
       icon: '🛡️',
-      href: '/reports/2'
+      href: '/reports/team_points'
     },
     {
       id: 3,
       title: 'Popularidad de Juegos',
       description: 'Nivel de actividad y puntos totales generados en cada videojuego.',
       icon: '🎮',
-      href: '/reports/3'
+      href: '/reports/games_ranking'
     },
     {
       id: 4,
       title: 'Áreas de Mejora por Equipo',
       description: 'El jugador de cada equipo que ha aportado la menor cantidad de puntos.',
       icon: '📉',
-      href: '/reports/4'
+      href: '/reports/laziest_player_team'
     },
     {
       id: 5,
       title: 'Menor Desempeño por Juego',
       description: 'El jugador que obtuvo el menor puntaje histórico en cada juego específico.',
       icon: '⚠️',
-      href: '/reports/5'
+      href: '/reports/laziest_player_game'
     }
   ];
 

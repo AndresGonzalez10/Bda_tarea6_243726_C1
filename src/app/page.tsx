@@ -7,7 +7,7 @@ export default function DashboardHome() {
       title: 'Ranking General de Jugadores',
       description: 'El top global de jugadores basado en la suma total de sus puntos en el torneo.',
       icon: '🏆',
-      href: '/reports/1'
+      href: '/reports/ranking'
     },
     {
       id: 2,
